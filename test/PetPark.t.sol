@@ -26,9 +26,15 @@ contract PetParkTest is Test, PetPark {
     }
 
     function testCannotAddAnimalWhenNonOwner() public {
-        // 1. Complete this test and remove the assert line below
-        assert(false);
+        // Create a new instance of PetPark owned by another address
+        PetPark petParkNewOwner = new PetPark();
+    
+        // Try to add 5 fishes to the animalCounts using the new owner's contract
+        vm.prank(address(petParkNewOwner));
+        vm.expectRevert("You are not owner");
+        petParkNewOwner.add(AnimalType.Fish, 5);
     }
+    
 
     function testCannotAddInvalidAnimal() public {
         vm.expectRevert("Invalid animal");
@@ -43,9 +49,14 @@ contract PetParkTest is Test, PetPark {
     }
 
     function testCannotBorrowWhenAgeZero() public {
-        // 2. Complete this test and remove the assert line below
-        assert(false);
+        // Add some fishes to the animalCounts
+        petPark.add(AnimalType.Fish, 5);
+    
+        // Try to borrow a fish with age zero
+        vm.expectRevert("Age must be larger than zero");
+        petPark.borrow(0, Gender.Male, AnimalType.Fish);
     }
+    
 
     function testCannotBorrowUnavailableAnimal() public {
         vm.expectRevert("Selected animal not available");
@@ -127,9 +138,15 @@ contract PetParkTest is Test, PetPark {
     }
 
     function testBorrowCountDecrement() public {
-        // 3. Complete this test and remove the assert line below
-        assert(false);
+        petPark.add(AnimalType.Fish, 5); // Add 5 fish to the animalCounts
+    
+        uint256 initialFishCount = petPark.animalCounts(AnimalType.Fish);
+        petPark.borrow(24, Gender.Male, AnimalType.Fish); // Borrow one fish
+    
+        uint256 updatedFishCount = petPark.animalCounts(AnimalType.Fish);
+        assertEq(updatedFishCount, initialFishCount - 1); // Assert that the fish count decreased by 1
     }
+    
 
     function testCannotGiveBack() public {
         vm.expectRevert("No borrowed pets");
